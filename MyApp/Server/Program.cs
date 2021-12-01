@@ -15,7 +15,7 @@ class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        //builder.Configuration.AddKeyPerFile("/run/secrets", optional: true);
+        builder.Configuration.AddKeyPerFile("/run/secrets", optional: true);
 
         // Add services to the container.
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -34,7 +34,7 @@ class Program
 
 
         // Connect to server with connection string
-        builder.Services.AddDbContext<StudyBankContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("StudyBank")));
+        builder.Services.AddDbContext<StudyBankContext>(options => options.UseSqlServer("Server=localhost;Database=StudyBank;User Id=sa;Password=474ecd0f-ba7d-4e63-a85b-0ea240087e4b"));
         builder.Services.AddScoped<IStudyBankContext, StudyBankContext>();
         builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 
