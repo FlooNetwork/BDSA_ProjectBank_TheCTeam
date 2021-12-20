@@ -9,46 +9,33 @@ namespace MyApp.Server;
 public static class SeedExtensions
 {
     private static List<string> existingEmails = new List<string>();
-
     public static IHost Seed(this IHost host)
     {
         using (var scope = host.Services.CreateScope())
         {
             var context = scope.ServiceProvider.GetRequiredService<StudyBankContext>();
 
-            SeedProjects(context);
+            // Only seed if the database does not contain any projects
+            if (!context.Projects.Any())
+            {
+                PopulateDatabase(context);
+            }
         }
         return host;
-    }
-
-    private static void SeedProjects(StudyBankContext context)
-    {
-        // If the DB doesn't contain any projects, populate it with data. Otherwise keep the old data.
-        // Use the startup.ps1 if changes have been made to the seeding algorithm / Entities.
-        if (!context.Projects.Any())
-        { //These sql queries doesnt work, because of some foreign key entity core problems :(
-        // context.Database.ExecuteSqlRaw("DELETE dbo.Users");
-        // context.Database.ExecuteSqlRaw("DELETE dbo.ProjectTag");
-        // context.Database.ExecuteSqlRaw("DELETE dbo.ProjectSupervisor");
-        // context.Database.ExecuteSqlRaw("DELETE dbo.Projects");
-        // context.Database.ExecuteSqlRaw("DELETE dbo.Tags");
-
-        PopulateDatabase(context);
-        }
     }
     ///<summary> 
     ///Default version of PopulateDatabase method with 50 Supervisors, 200 Projects, and 1-7 Tags per Project. 
     ///Adds the 200 randomly generated Projects (with 50 randomly assigned Supervisors, and a number of Tags) and 
     ///Tags (that are assigned to the corresponding Projects) to the context, and saves the context.
     ///</summary>
-    public static void PopulateDatabase(StudyBankContext context)
+    private static void PopulateDatabase(StudyBankContext context)
     {
         PopulateDatabase(context, 50, 200, 1, 7);
     }
 
     ///<summary> 
     ///Adds randomly generated Projects (with randomly assigned Supervisors and Tags) and 
-    /// Tags (that are assigned corresponding Projects) to the context, and saves the context.
+    ///Tags (that are assigned corresponding Projects) to the context, and saves the context.
     ///</summary>
     ///<param name="context">the StudyBankContext to be modified</param>
     ///<param name="sNum">the number of generated Supervisors</param>
@@ -152,7 +139,7 @@ public static class SeedExtensions
         return project;
     }
 
-    public static Student RandomStudent()
+    private static Student RandomStudent()
     {
         // Name is build up of 1 first name and 2 surnames
         Random r = new Random();
